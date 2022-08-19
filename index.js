@@ -6,10 +6,11 @@ import { registerValidation, loginValidation, goodsCreateValidation } from './va
 import checkAuth from './utils/checkAuth.js'
 import * as UserController from './controllers/UserController.js'
 import * as GoodsController from './controllers/GoodsController.js'
+import * as OrderController from './controllers/OrderController.js'
 import handleValidationErrors from './utils/handleValidationErrors.js'
 
 
-gitmongoose.connect('')
+mongoose.connect('mongodb+srv://admin:wwwwww@cluster0.v237qzh.mongodb.net/market?retryWrites=true&w=majority')
     .then(() => console.log('BD OK'))
     .catch(err => console.log('DB error', err))
 
@@ -49,6 +50,11 @@ app.get('/goods', GoodsController.getAll) //find All
 app.get('/goods/:id', GoodsController.getOne) // find One 
 app.delete('/goods/:id', checkAuth, GoodsController.remove) // delete one
 app.patch('/goods/:id', checkAuth, goodsCreateValidation, handleValidationErrors, GoodsController.update) // update goods
+
+//order
+
+app.post('/order', checkAuth, handleValidationErrors, OrderController.create) // create order
+app.get('/order', OrderController.getAll) //find All
 
 
 app.listen(4444, (err) => {
