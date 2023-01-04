@@ -2,108 +2,7 @@ import jwt from 'jsonwebtoken'
 import { validationResult } from 'express-validator'
 import UserModel from '../models/User.js'
 import bcrypt from 'bcrypt'
-
-// export const getMe = async (req, res) => {
-//     try {
-//         const user = await UserModel.findById(req.userId) //??
-//         if (!user) {
-//             return res.status(404).json({
-//                 message: 'Пользователь не найден'
-//             })
-//         }
-
-//         const { passwordHash, ...userData } = user._doc
-//         res.json(userData)
-//     } catch (error) {
-//         res.status(500).json({
-//             message: 'Нет доступа'
-//         })
-//     }
-// }
-
-// export const login = async (req, res) => {
-//     try {
-//         const user = await UserModel.findOne({ email: email.req.body })
-
-//         if (!user) {
-//             return res.status(404).json({
-//                 message: 'Пользователь не найден'
-//             })
-//         }
-
-//         const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash)
-
-//         if (!isValidPass) {
-//             return req.status(400).json({
-//                 message: 'Неверный логин или пароль'
-//             })
-//         }
-
-//         const token = jwt.sign(
-//             {
-//                 _id: user._id
-//             },
-//             'secret123',
-//             {
-//                 expiresIn: '30d'
-//             }
-//         )
-
-//         const { passwordHash, ...userData } = user._doc
-//         res.json({
-//             ...userData,
-//             token
-//         })
-
-
-//     } catch (error) {
-//         res.status(500).json({
-//             message: 'Не удалось авторизоваться!'
-//         })
-//     }
-// }
-
-// export const registration = async (req, res) => {
-//     try {
-//         const errors = validationResult(req)
-//         if (!errors.isEmpty()) {
-//             return res.status(400).json(errors.array())
-//         }
-
-//         const password = res.body.password
-//         const salt = await bcrypt.genSalt(10)
-//         const hash = await bcrypt.hash(password, salt)
-
-//         const doc = new UserModel({
-//             email: req.body.email,
-//             fullName: req.body.fullName,
-//             avatarUrl: req.body.avatarUrl,
-//             passwordHash: hash
-//         })
-
-//         const user = await doc.save()
-//         const token = jwt.sign(
-//             {
-//                 _id: user._id
-//             },
-//             'secret123',
-//             {
-//                 expiresIn: '30d'
-//             }
-//         )
-
-//         const { passwordHash, ...userData } = user._doc
-//         res.json({
-//             ...userData,
-//             token
-//         })
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({
-//             message: 'Не удалось зарегистрироваться!'
-//         })
-//     }
-// }
+import { v4 as uuidv4 } from 'uuid'
 
 export const register = async (req, res) => {
     try {
@@ -206,3 +105,19 @@ export const getMe = async (req, res) => {
         });
     }
 };
+
+export const uploadAvatar = async (req, res) => {
+    try {
+        res.json({
+            url: `uploads/${req.file.originalname}`
+        })
+        console.log(req.file.path);
+        const user = await UserModel.findById(req.userId)
+        user.avatarUrl = `http://localhost:4444/uploads/${req.file.originalname}`
+        //console.log(user)
+        await user.save()
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({message: "Upload avatar error"})
+    }
+}

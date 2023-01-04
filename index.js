@@ -24,6 +24,16 @@ const storage = multer.diskStorage({
     }    
 })
 
+// const types = ['image/png', 'image/jpg', 'image/jpeg']
+
+// const fileFilter = (req, file, res) => {
+//     if(types.includes(file.mimetype)) {
+//         cb(null, true)
+//     } else {
+//         cb(null, false)
+//     }
+// }
+
 const upload = multer({storage})
 app.use('/uploads', express.static('uploads'))
 app.use('/favicon.ico', express.static('public/favicon.ico'))
@@ -38,12 +48,10 @@ app.get('/', (req, res) => {
 app.get('/auth/me', checkAuth, UserController.getMe) // find me
 app.post('/auth/login',  loginValidation, handleValidationErrors, UserController.login) // авторизация
 app.post('/auth/register', registerValidation, handleValidationErrors, UserController.register) // регистрация
+app.post('/upload/avatar', checkAuth, upload.single('image'), UserController.uploadAvatar) // upload avatar
 
-app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
-    res.json({
-        url: `uploads/${req.file.originalname}`
-    })
-})
+//app.post('/upload/avatar', checkAuth, upload.single('image'), UploadController.uploadAvatar)
+//app.post('/upload', checkAuth, upload.single('image'), UploadController.uploadFile)
 
 app.post('/goods', checkAuth, goodsCreateValidation, handleValidationErrors, GoodsController.create) // create goods
 app.get('/goods', GoodsController.getAll) //find All
